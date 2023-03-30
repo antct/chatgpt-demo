@@ -2,7 +2,7 @@ import os
 from typing import Any, List, Mapping, Optional
 
 import streamlit as st
-from langchain.agents import initialize_agent, load_tools
+from langchain.agents import initialize_agent
 from langchain.llms import OpenAI
 from langchain.llms.base import LLM
 from langchain.tools import BaseTool
@@ -28,7 +28,6 @@ class CustomLLM(LLM, BaseModel):
             "Begin!",
             "Please answer in Chinese in the follow-up sessions!"
         )
-        # thought = ask_chatgpt_with_stop(prompt=prompt, stop=stop)
         thought = openai_llm.__call__(prompt=prompt, stop=stop).strip()
         st.text_area(label="Thought", value=thought)
         return thought

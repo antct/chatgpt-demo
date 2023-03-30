@@ -1,3 +1,10 @@
+import os
+from typing import Any, List, Mapping, Optional
+
+from langchain.llms import OpenAI
+from langchain.llms.base import LLM
+from pydantic import BaseModel
+
 from utils import ConfigReader
 
 
@@ -32,6 +39,51 @@ def ask_chatgpt_with_stop(prompt, stop):
                 n = message.rfind(s)
                 break
     return message[:n]
+
+
+class RevChatGPT(LLM, BaseModel):
+    llm_name = "RevChatGPT"
+
+    @property
+    def _llm_type(self) -> str:
+        return RevChatGPT.llm_name
+
+    def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
+        prompt = prompt.replace(
+            "Begin!",
+            "Please answer in Chinese in the follow-up sessions!"
+        )
+        thought = ask_chatgpt_with_stop(prompt=prompt, stop=stop)
+        return thought
+
+    @property
+    def _identifying_params(self) -> Mapping[str, Any]:
+        """Get the identifying parameters."""
+        return {}
+
+
+os.environ["OPENAI_API_KEY"] = ConfigReader().get("openai", "key")
+openai_llm = OpenAI(temperature=0)
+
+
+class OpenAIChatGPT(LLM, BaseModel):
+    llm_name = "OpenAIChatGPT"
+
+    @property
+    def _llm_type(self) -> str:
+        return OpenAIChatGPT.llm_name
+
+    def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
+        prompt = prompt.replace(
+            "Begin!",
+            "Please answer in Chinese in the follow-up sessions!"
+        )
+        return openai_llm.__call__(prompt=prompt, stop=stop)
+
+    @property
+    def _identifying_params(self) -> Mapping[str, Any]:
+        """Get the identifying parameters."""
+        return {}
 
 
 if __name__ == "__main__":
