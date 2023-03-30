@@ -1,0 +1,9 @@
+[openai]
+key=
+
+[chatgpt]
+access_token=
+
+[google]
+keys=[]
+cxs=[]
